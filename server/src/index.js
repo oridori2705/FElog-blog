@@ -7,6 +7,7 @@ module.exports = {
    *
    * This gives you an opportunity to extend code.
    */
+  // TODO : 아래 중복되는 코드 리팩토링 수행
   register({ strapi }) {
     const extensionService = strapi.plugin("graphql").service("extension");
 
@@ -64,6 +65,60 @@ module.exports = {
 
             const deletePost = await strapi.entityService.delete(
               "api::post.post",
+              args.id
+            );
+            return toEntityResponse(deletePost);
+          },
+          //Comment
+          updateComment: async (_, args, ctx) => {
+            const { toEntityResponse } = strapi
+              .plugin("graphql")
+              .service("format").returnTypes;
+            const post = await strapi.entityService.findOne(
+              "api::comment.comment",
+              args.id,
+              { populate: { user: true } }
+            );
+
+            if (post.user.id !== ctx.state.user.id) {
+              throw new Error("You are not authorized to update this comment");
+            }
+
+            const updatePost = await strapi.entityService.update(
+              "api::comment:comment",
+              args.id,
+              args
+            );
+            return toEntityResponse(updatePost);
+          },
+          createComment: async (_, args, ctx) => {
+            const { toEntityResponse } = strapi
+              .plugin("graphql")
+              .service("format").returnTypes;
+            const post = await strapi.entityService.create(
+              "api::comment.comment",
+              {
+                data: { ...args.data, user: ctx.state.user.id },
+              }
+            );
+
+            return toEntityResponse(post);
+          },
+          deleteComment: async (_, args, ctx) => {
+            const { toEntityResponse } = strapi
+              .plugin("graphql")
+              .service("format").returnTypes;
+            const post = await strapi.entityService.findOne(
+              "api::comment.comment",
+              args.id,
+              { populate: { user: true } }
+            );
+            if (post.user.id !== ctx.state.user.id) {
+              throw new Error("You are not authorized to delete this comment");
+            }
+
+            const deletePost = await strapi.entityService.delete(
+              "api::comment.comment",
               args.id
             );
             return toEntityResponse(deletePost);
