@@ -49,6 +49,25 @@ module.exports = {
 
             return toEntityResponse(post);
           },
+          deletePost: async (_, args, ctx) => {
+            const { toEntityResponse } = strapi
+              .plugin("graphql")
+              .service("format").returnTypes;
+            const post = await strapi.entityService.findOne(
+              "api::post.post",
+              args.id,
+              { populate: { user: true } }
+            );
+            if (post.user.id !== ctx.state.user.id) {
+              throw new Error("You are not authorized to delete this post");
+            }
+
+            const deletePost = await strapi.entityService.delete(
+              "api::post.post",
+              args.id
+            );
+            return toEntityResponse(deletePost);
+          },
         },
       },
     });
