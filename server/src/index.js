@@ -39,6 +39,16 @@ module.exports = {
             );
             return toEntityResponse(updatePost);
           },
+          createPost: async (_, args, ctx) => {
+            const { toEntityResponse } = strapi
+              .plugin("graphql")
+              .service("format").returnTypes;
+            const post = await strapi.entityService.create("api::post.post", {
+              data: { ...args.data, user: ctx.state.user.id }, // 이 부분이 중요하다 data:{...}에 넣어서 user을 보내줘야하고, args는 이미 data에 감싸져있으므로 .data로 명시해야한다.
+            });
+
+            return toEntityResponse(post);
+          },
         },
       },
     });
