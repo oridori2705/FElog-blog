@@ -27,6 +27,10 @@ const GET_POST = gql`
   }
 `;
 
+const PostDetail = ({ params }: { params: { id: string } }) => {
+  const { data, loading, error } = useQuery(GET_POST, {
+    variables: { id: params.id },
+  });
 
   return (
     <Container size="small" co={{ marginTop: 16 }}>
