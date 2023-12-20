@@ -40,6 +40,10 @@ const PostDetail = ({ params }: { params: { id: string } }) => {
         <>
           <Heading>{data.post.data.attributes.title}</Heading>
           <Divider />
+          <Text>
+            {data.post.data.attributes.body && (
+              <BlocksRenderer content={data.post.data.attributes.body} />
+            )}
           </Text>
           <Divider />
           <Text size="small">

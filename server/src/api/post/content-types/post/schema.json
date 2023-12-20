@@ -4,7 +4,8 @@
   "info": {
     "singularName": "post",
     "pluralName": "posts",
-    "displayName": "Post"
+    "displayName": "Post",
+    "description": ""
   },
   "options": {
     "draftAndPublish": false
@@ -13,9 +14,6 @@
   "attributes": {
     "title": {
       "type": "string"
-    },
-    "body": {
-      "type": "blocks"
     },
     "user": {
       "type": "relation",
@@ -28,6 +26,9 @@
       "relation": "oneToMany",
       "target": "api::comment.comment",
       "mappedBy": "post"
+    },
+    "body": {
+      "type": "blocks"
     }
   }
 }

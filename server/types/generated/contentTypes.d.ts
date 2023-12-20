@@ -407,13 +407,13 @@ export interface ApiPostPost extends Schema.CollectionType {
     singularName: 'post';
     pluralName: 'posts';
     displayName: 'Post';
+    description: '';
   };
   options: {
     draftAndPublish: false;
   };
   attributes: {
     title: Attribute.String;
-    body: Attribute.Blocks;
     user: Attribute.Relation<
       'api::post.post',
       'manyToOne',
@@ -424,6 +424,7 @@ export interface ApiPostPost extends Schema.CollectionType {
       'oneToMany',
       'api::comment.comment'
     >;
+    body: Attribute.Blocks;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<'api::post.post', 'oneToOne', 'admin::user'> &

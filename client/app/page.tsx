@@ -56,6 +56,10 @@ export default function Home() {
                   <Link href="/posts/[id]" as={`posts/${post.id}`}>
                     <Heading level={4}>{post.attributes.title}</Heading>
                   </Link>
+                  <Text lineClamp={3}>
+                    {post.attributes.body && (
+                      <BlocksRenderer content={post.attributes.body} />
+                    )}
                   </Text>
                   <Divider />
 
