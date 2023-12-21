@@ -81,7 +81,7 @@ const PostEdit = () => {
       toggleLoading(false);
       router.push("/");
     },
-    [updatePost, toggleLoading, router]
+    [updatePost, toggleLoading, router, params]
   );
 
   return (
