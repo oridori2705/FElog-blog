@@ -17,7 +17,7 @@ import { BlocksRenderer } from "@strapi/blocks-react-renderer";
 
 const GET_POSTS = gql`
   query GetPosts {
-    posts {
+    posts(sort: ["createdAt:desc"]) {
       data {
         id
         attributes {
