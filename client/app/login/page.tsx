@@ -13,11 +13,9 @@ interface FormElements extends HTMLFormElement {
   password: HTMLInputElement;
 }
 
-const REGISTER = gql`
-  mutation Register($username: String!, $email: String!, $password: String!) {
-    register(
-      input: { username: $username, email: $email, password: $password }
-    ) {
+const LOGIN = gql`
+  mutation Login($email: String!, $password: String!) {
+    login(input: { identifier: $email, password: $password }) {
       jwt
     }
   }
@@ -25,7 +23,7 @@ const REGISTER = gql`
 
 const SignUp = () => {
   const [loading, toggleLoading] = useToggle();
-  const [register] = useMutation(REGISTER);
+  const [login] = useMutation(LOGIN);
   const router = useRouter();
 
   useEffect(() => {
@@ -43,18 +41,17 @@ const SignUp = () => {
       toggleLoading(true);
 
       const elements: FormElements = e.currentTarget;
-      const username = elements.username.value;
       const email = elements.email.value;
       const password = elements.password.value;
 
-      const result = await register({
-        variables: { username, email, password },
+      const result = await login({
+        variables: { email, password },
       });
-      nookies.set(null, "token", result.data.register.jwt, { path: "/" });
+      nookies.set(null, "token", result.data.login.jwt, { path: "/" });
       toggleLoading(false);
       router.push("/");
     },
-    [toggleLoading, router, register]
+    [toggleLoading, router, login]
   );
 
   return (
@@ -65,11 +62,10 @@ const SignUp = () => {
       <Divider />
       <form onSubmit={handleSubmit}>
         <Stack>
-          <input type="text" placeholder="Username" name="username" />
           <input type="email" placeholder="Email" name="email" />
           <input type="password" placeholder="Password" name="password" />
           <Button type="submit" loading={loading}>
-            Sign Up
+            Login
           </Button>
         </Stack>
       </form>
