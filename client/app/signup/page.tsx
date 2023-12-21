@@ -35,7 +35,7 @@ const SignUp = () => {
     if (token) {
       router.push("/");
     }
-  }, []);
+  }, [router]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent<FormElements>) => {
