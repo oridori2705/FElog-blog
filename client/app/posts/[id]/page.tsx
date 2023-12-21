@@ -1,7 +1,6 @@
 "use client";
 
-import { User } from "@/interfaces";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   Button,
   Container,
@@ -12,8 +11,10 @@ import {
   Text,
 } from "@co-design/core";
 import { BlocksRenderer } from "@strapi/blocks-react-renderer";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useMyContext } from "@/app/Provider";
+import { useCallback } from "react";
+import Link from "next/link";
 
 const GET_POST = gql`
   query GetPost($id: ID!) {
@@ -38,13 +39,34 @@ const GET_POST = gql`
   }
 `;
 
+const DELETE_POST = gql`
+  mutation DeletePost($id: ID!) {
+    deletePost(id: $id) {
+      data {
+        id
+      }
+    }
+  }
+`;
+
 const PostDetail = () => {
   const me = useMyContext();
-  console.log(me);
+  const router = useRouter();
   const params = useParams<{ id: string }>();
   const { data, loading, error } = useQuery(GET_POST, {
     variables: { id: params.id },
   });
+  const [deletePost] = useMutation(DELETE_POST);
+
+  const handleDelete = useCallback(async () => {
+    if (confirm("정말로 삭제하시겠습니까?")) {
+      await deletePost({
+        refetchQueries: ["GetPosts"],
+        variables: { id: params.id },
+      });
+      router.push("/");
+    }
+  }, [deletePost, router, params]);
 
   return (
     <Container size="small" co={{ marginTop: 16 }}>
@@ -54,8 +76,12 @@ const PostDetail = () => {
         <>
           {me?.id === data.post.data.attributes.user.data.id && (
             <Group spacing={8} position="right">
-              <Button style={{ backgroundColor: "red" }}>삭제</Button>
-              <Button>수정</Button>
+              <Button style={{ backgroundColor: "red" }} onClick={handleDelete}>
+                삭제
+              </Button>
+              <Link href="/posts/[id]/edit" as={`/posts/${data.post.id}/edit`}>
+                <Button>수정</Button>
+              </Link>
             </Group>
           )}
 
