@@ -3,7 +3,7 @@
 import { gql, useQuery } from "@apollo/client";
 import { Container, Divider, Heading, Spinner, Text } from "@co-design/core";
 import { BlocksRenderer } from "@strapi/blocks-react-renderer";
-import { useRouter } from "next/router";
+import { useParams } from "next/navigation";
 
 const GET_POST = gql`
   query GetPost($id: ID!) {
@@ -27,7 +27,9 @@ const GET_POST = gql`
   }
 `;
 
-const PostDetail = ({ params }: { params: { id: string } }) => {
+const PostDetail = () => {
+  const params = useParams<{ id: string }>();
+  console.log(params);
   const { data, loading, error } = useQuery(GET_POST, {
     variables: { id: params.id },
   });
