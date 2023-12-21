@@ -40,7 +40,10 @@ const CreatePost = () => {
       const elements: FormElements = e.currentTarget;
       const title = elements.titleInput.value;
       const body = elements.body.value;
-      await createPost({ variables: { title, body } });
+      await createPost({
+        refetchQueries: ["GetPosts"],
+        variables: { title, body },
+      });
       toggleLoading(false);
       router.push("/");
     },
