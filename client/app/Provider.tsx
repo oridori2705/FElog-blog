@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import {
   ApolloClient,
   ApolloProvider,
@@ -10,7 +10,7 @@ import {
 import { AppShell } from "@co-design/core";
 import { Header } from "@/components";
 import { setContext } from "@apollo/client/link/context";
-import nookies from "nookies";
+import nookies, { parseCookies } from "nookies";
 
 const httpLink = createHttpLink({
   uri: "http://localhost:1337/graphql",
@@ -33,13 +33,20 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
-const header = (
-  <AppShell.Header height={70}>
-    <Header />
-  </AppShell.Header>
-);
-
 function Provider({ children }: { children: ReactNode }) {
+  const [token, setToken] = useState("");
+
+  useEffect(() => {
+    const { token } = parseCookies();
+    setToken(token);
+  }, []);
+
+  const header = (
+    <AppShell.Header height={70}>
+      <Header token={token} />
+    </AppShell.Header>
+  );
+
   return (
     <ApolloProvider client={client}>
       <AppShell fixed header={header}>
