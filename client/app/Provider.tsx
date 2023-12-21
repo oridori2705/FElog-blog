@@ -6,17 +6,24 @@ import {
   ApolloProvider,
   InMemoryCache,
   createHttpLink,
+  gql,
 } from "@apollo/client";
 import { AppShell } from "@co-design/core";
 import { Header } from "@/components";
 import { setContext } from "@apollo/client/link/context";
 import nookies, { parseCookies } from "nookies";
+import { User } from "@/interfaces";
+import { AppContext } from "next/app";
 
 const httpLink = createHttpLink({
   uri: "http://localhost:1337/graphql",
 });
 
-const authLink = setContext((_, { headers }) => {
+import { createContext, useContext } from "react";
+
+const MyContext = createContext<User | null>(null);
+
+const authLink = setContext((_, { nextContext, headers }) => {
   // const token = localStorage.getItem("token");
   const { token } = nookies.get();
 
@@ -35,12 +42,35 @@ const client = new ApolloClient({
 
 function Provider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState("");
+  const [userInfo, setUserInfo] = useState<User | null>(null);
+
+  const fetchData = async () => {
+    const { token } = parseCookies();
+    if (token) {
+      setToken(token);
+      const QUERY = gql`
+        query Me {
+          me {
+            id
+            username
+            email
+          }
+        }
+      `;
+      try {
+        const { data } = await client.query<{ me: User }>({
+          query: QUERY,
+        });
+        setUserInfo(data.me);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    }
+  };
 
   useEffect(() => {
-    const { token } = parseCookies();
-    setToken(token);
+    fetchData();
   }, []);
-
   const header = (
     <AppShell.Header height={70}>
       <Header token={token} />
@@ -49,11 +79,15 @@ function Provider({ children }: { children: ReactNode }) {
 
   return (
     <ApolloProvider client={client}>
-      <AppShell fixed header={header}>
-        {children}
-      </AppShell>
+      <MyContext.Provider value={userInfo}>
+        <AppShell fixed header={header}>
+          {children}
+        </AppShell>
+      </MyContext.Provider>
     </ApolloProvider>
   );
 }
+
+export const useMyContext = () => useContext(MyContext);
 
 export default Provider;
